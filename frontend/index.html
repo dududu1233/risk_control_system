@@ -6,103 +6,149 @@
   <title>企业风控中台</title>
   <style>
     :root {
-      --bg: #f5f7fa; --panel: #ffffff; --ink: #1f2937; --muted: #6b7280;
-      --line: #e5e7eb; --brand: #2563eb; --brand-soft: #eff6ff;
-      --red: #dc2626; --red-soft: #fef2f2; --green: #16a34a; --green-soft: #f0fdf4;
-      --amber: #d97706; --amber-soft: #fffbeb;
+      --bg: #f5f7fb; --panel: #ffffff; --ink: #0f172a; --muted: #64748b; --faint: #94a3b8;
+      --line: #e9edf3; --line-strong: #dbe1ea;
+      --brand: #2f6df6; --brand-soft: #eaf1ff;
+      --red: #e23b3b; --red-soft: #fdecec; --red-ink: #b42318;
+      --green: #18a957; --green-soft: #ecfdf3; --green-ink: #067a3c;
+      --amber: #d98a06; --amber-soft: #fdf3e2; --amber-ink: #9a6304;
+      --indigo: #5b54e6; --indigo-soft: #eeecfd;
+      --shadow: 0 1px 2px rgba(16,24,40,.04), 0 6px 18px rgba(16,24,40,.06);
+      --radius: 14px; --radius-sm: 10px;
     }
     * { box-sizing: border-box; }
-    body { margin: 0; font-family: "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
-           background: var(--bg); color: var(--ink); font-size: 14px; }
+    html, body { height: 100%; }
+    body { margin: 0; font-family: "Segoe UI", "Microsoft YaHei", system-ui, -apple-system, sans-serif;
+           background: var(--bg); color: var(--ink); font-size: 14px; -webkit-font-smoothing: antialiased; }
     button { font-family: inherit; cursor: pointer; }
     .hidden { display: none !important; }
+    ::-webkit-scrollbar { width: 10px; height: 10px; }
+    ::-webkit-scrollbar-thumb { background: #d7dde6; border-radius: 8px; }
+    ::-webkit-scrollbar-thumb:hover { background: #c3ccd8; }
 
-    /* 登录 */
+    /* ---------- 登录 ---------- */
     .login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center;
-                  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 60%, #0ea5e9 100%); }
-    .login-card { width: 360px; background: #fff; border-radius: 14px; padding: 32px;
-                  box-shadow: 0 20px 50px rgba(0,0,0,.25); }
-    .login-card h1 { font-size: 20px; margin: 0 0 4px; color: var(--brand); }
-    .login-card .sub { color: var(--muted); margin-bottom: 22px; font-size: 13px; }
+                  background: radial-gradient(1200px 600px at 70% -10%, #1e3a8a, transparent),
+                              linear-gradient(135deg, #0f172a 0%, #1e3a8a 55%, #2f6df6 120%); }
+    .login-card { width: 380px; background: #fff; border-radius: 18px; padding: 34px 32px; box-shadow: 0 24px 60px rgba(0,0,0,.3); }
+    .login-card h1 { font-size: 21px; margin: 0 0 4px; letter-spacing: .5px; }
+    .login-card .sub { color: var(--muted); margin-bottom: 24px; font-size: 13px; }
     .field { margin-bottom: 14px; }
-    .field label { display: block; margin-bottom: 6px; color: var(--muted); font-size: 13px; }
+    .field label { display: block; margin-bottom: 6px; color: var(--muted); font-size: 12.5px; }
     .field input, .field select, .field textarea {
-      width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 14px; }
-    .btn { background: var(--brand); color: #fff; border: none; padding: 11px 14px;
-           border-radius: 8px; font-size: 14px; width: 100%; }
+      width: 100%; padding: 11px 12px; border: 1px solid var(--line-strong); border-radius: 9px;
+      font-size: 14px; background: #fbfcfe; transition: .15s; }
+    .field input:focus, .field select:focus, .field textarea:focus { outline: none; border-color: var(--brand); background: #fff;
+      box-shadow: 0 0 0 3px var(--brand-soft); }
+    .btn { background: var(--brand); color: #fff; border: none; padding: 11px 14px; border-radius: 9px; font-size: 14px; font-weight: 500; }
     .btn:hover { filter: brightness(1.05); }
-    .btn.sm { width: auto; padding: 6px 12px; font-size: 13px; }
+    .btn:active { transform: translateY(1px); }
+    .btn.sm { width: auto; padding: 7px 13px; font-size: 13px; }
     .btn.ghost { background: #fff; color: var(--brand); border: 1px solid var(--brand); }
+    .btn.ghost:hover { background: var(--brand-soft); }
     .btn.danger { background: var(--red); }
+    .btn.danger:hover { background: #c92f2f; }
     .btn.amber { background: var(--amber); }
-    .err { color: var(--red); font-size: 13px; min-height: 18px; margin-top: 8px; }
-    .demo-accounts { margin-top: 18px; font-size: 12px; color: var(--muted);
-                     background: var(--brand-soft); padding: 10px; border-radius: 8px; line-height: 1.7; }
+    .btn.amber:hover { background: #bd7605; }
+    .err { color: var(--red); font-size: 13px; min-height: 18px; margin-top: 10px; }
+    .demo-accounts { margin-top: 20px; font-size: 12px; color: var(--muted); background: var(--brand-soft);
+                     padding: 12px 14px; border-radius: 10px; line-height: 1.8; }
 
-    /* 布局 */
+    /* ---------- 布局 ---------- */
     .shell { display: flex; min-height: 100vh; }
-    .sidebar { width: 210px; background: #0f172a; color: #cbd5e1; padding: 18px 0; flex-shrink: 0; }
-    .sidebar .logo { color: #fff; font-weight: 700; font-size: 16px; padding: 0 20px 18px; }
-    .sidebar a { display: block; padding: 11px 20px; color: #cbd5e1; text-decoration: none; font-size: 14px; }
-    .sidebar a:hover, .sidebar a.active { background: #1e293b; color: #fff; }
-    .main { flex: 1; display: flex; flex-direction: column; }
-    .topbar { height: 56px; background: #fff; border-bottom: 1px solid var(--line);
-              display: flex; align-items: center; justify-content: space-between; padding: 0 22px; }
-    .topbar .who { color: var(--muted); font-size: 13px; }
+    .sidebar { width: 232px; background: #0f172a; color: #cbd5e1; padding: 20px 14px; flex-shrink: 0;
+               display: flex; flex-direction: column; }
+    .sidebar .logo { color: #fff; font-weight: 700; font-size: 17px; padding: 4px 10px 20px; letter-spacing: .5px; }
+    .sidebar .logo .dot { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--brand); margin-right: 8px; vertical-align: middle; }
+    .nav-group { font-size: 11px; color: #64748b; padding: 10px 12px 6px; letter-spacing: 1px; }
+    .sidebar a { display: flex; align-items: center; gap: 10px; padding: 10px 12px; margin: 2px 0; color: #cbd5e1;
+                 text-decoration: none; font-size: 14px; border-radius: 9px; border-left: 3px solid transparent; transition: .15s; }
+    .sidebar a:hover { background: rgba(255,255,255,.06); color: #fff; }
+    .sidebar a.active { background: rgba(47,109,246,.18); color: #fff; border-left-color: var(--brand); }
+    .sidebar a .ic { width: 18px; text-align: center; opacity: .9; }
+    .sidebar .spacer { flex: 1; }
+    .sidebar .foot { font-size: 11px; color: #475569; padding: 10px 12px; }
+
+    .main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+    .topbar { height: 58px; background: #fff; border-bottom: 1px solid var(--line);
+              display: flex; align-items: center; justify-content: space-between; padding: 0 24px; position: sticky; top: 0; z-index: 10; }
+    .topbar .pg { font-weight: 600; font-size: 15px; }
+    .topbar .who { color: var(--muted); font-size: 13px; display: flex; align-items: center; gap: 14px; }
     .topbar .who b { color: var(--ink); }
-    .content { padding: 22px; }
-    .page-title { font-size: 18px; font-weight: 600; margin: 0 0 16px; }
+    .topbar .avatar { width: 30px; height: 30px; border-radius: 50%; background: var(--brand); color: #fff;
+                      display: inline-flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 600; }
+    .content { padding: 24px; max-width: 1240px; width: 100%; margin: 0 auto; }
+    .page-head { margin-bottom: 18px; }
+    .page-title { font-size: 19px; font-weight: 600; margin: 0; }
+    .page-desc { color: var(--muted); font-size: 13px; margin: 4px 0 0; }
 
-    /* 卡片/统计 */
-    .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 18px; }
-    .stat { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
-    .stat .k { color: var(--muted); font-size: 13px; }
-    .stat .v { font-size: 26px; font-weight: 700; margin-top: 6px; }
+    /* ---------- KPI 卡片 ---------- */
+    .cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(186px, 1fr)); gap: 14px; margin-bottom: 18px; }
+    .stat { position: relative; background: var(--panel); border: 1px solid var(--line); border-left: 3px solid var(--line-strong);
+            border-radius: var(--radius); padding: 16px 18px; box-shadow: var(--shadow); }
+    .stat.red { border-left-color: var(--red); } .stat.green { border-left-color: var(--green); }
+    .stat.amber { border-left-color: var(--amber); } .stat.blue { border-left-color: var(--brand); }
+    .stat .k { color: var(--muted); font-size: 12.5px; }
+    .stat .v { font-size: 28px; font-weight: 600; margin-top: 8px; line-height: 1; }
     .stat.red .v { color: var(--red); } .stat.green .v { color: var(--green); }
-    .stat.amber .v { color: var(--amber); }
+    .stat.amber .v { color: var(--amber); } .stat.blue .v { color: var(--brand); }
 
-    .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px; margin-bottom: 18px; }
-    .panel h3 { margin: 0 0 14px; font-size: 15px; }
+    .grid2 { display: grid; grid-template-columns: 1.5fr 1fr; gap: 18px; margin-bottom: 18px; }
+    @media (max-width: 920px) { .grid2 { grid-template-columns: 1fr; } }
+    .panel { background: var(--panel); border: 1px solid var(--line); border-radius: var(--radius); padding: 18px 20px;
+             margin-bottom: 18px; box-shadow: var(--shadow); }
+    .panel h3 { margin: 0 0 4px; font-size: 15px; font-weight: 600; }
+    .panel .ph-sub { color: var(--muted); font-size: 12.5px; margin: 0 0 14px; }
 
-    /* 表格 */
-    table { width: 100%; border-collapse: collapse; }
-    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); font-size: 13px; }
-    th { color: var(--muted); font-weight: 600; background: #fafafa; }
-    tr:hover td { background: #fcfdff; }
+    /* ---------- 表格 ---------- */
+    .table-wrap { overflow-x: auto; border-radius: var(--radius-sm); }
+    table { width: 100%; border-collapse: collapse; min-width: 640px; }
+    th, td { text-align: left; padding: 11px 14px; border-bottom: 1px solid var(--line); font-size: 13px; white-space: nowrap; }
+    th { color: var(--muted); font-weight: 600; background: #f8fafc; position: sticky; top: 0; font-size: 12.5px; }
+    tbody tr:hover { background: #fafcff; }
+    td .soft { color: var(--muted); font-size: 12px; }
 
-    .tag { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 12px; font-weight: 600; }
-    .tag.ALLOW { background: var(--green-soft); color: var(--green); }
-    .tag.WARN { background: var(--amber-soft); color: var(--amber); }
-    .tag.ALERT { background: #fef3c7; color: #b45309; }
-    .tag.BLOCK { background: var(--red-soft); color: var(--red); }
-    .tag.BLACK { background: var(--red-soft); color: var(--red); }
-    .tag.WHITE { background: var(--green-soft); color: var(--green); }
-    .tag.on { background: var(--green-soft); color: var(--green); }
+    .tag { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+    .tag::before { content: ""; width: 6px; height: 6px; border-radius: 50%; background: currentColor; opacity: .85; }
+    .tag.ALLOW, .tag.on, .tag.WHITE, .tag.PASS { background: var(--green-soft); color: var(--green-ink); }
+    .tag.WARN { background: var(--amber-soft); color: var(--amber-ink); }
+    .tag.ALERT { background: var(--indigo-soft); color: #4338ca; }
+    .tag.BLOCK, .tag.BLACK { background: var(--red-soft); color: var(--red-ink); }
     .tag.off { background: #f1f5f9; color: var(--muted); }
+    .tag::before { display: none; }
 
-    /* 柱状条 */
-    .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 13px; }
+    /* ---------- 条形 / 图例 ---------- */
+    .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 9px; font-size: 13px; }
     .bar-row .name { width: 150px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-    .bar-track { flex: 1; background: #f1f5f9; border-radius: 6px; height: 16px; position: relative; }
-    .bar-fill { height: 16px; border-radius: 6px; background: var(--brand); }
-    .bar-row .num { width: 38px; text-align: right; }
+    .bar-track { flex: 1; background: #f1f5f9; border-radius: 6px; height: 18px; }
+    .bar-fill { height: 18px; border-radius: 6px; background: var(--brand); }
+    .bar-row .num { width: 40px; text-align: right; font-variant-numeric: tabular-nums; }
+    .legend { display: flex; gap: 16px; flex-wrap: wrap; margin-top: 10px; }
+    .lg { display: inline-flex; align-items: center; gap: 6px; font-size: 12.5px; color: var(--muted); }
+    .lg i { width: 11px; height: 11px; border-radius: 3px; display: inline-block; }
 
-    /* 弹窗 */
-    .modal-mask { position: fixed; inset: 0; background: rgba(15,23,42,.45); display: flex;
-                  align-items: center; justify-content: center; z-index: 50; }
-    .modal { background: #fff; border-radius: 12px; width: 520px; max-width: 92vw; padding: 22px; }
-    .modal h3 { margin: 0 0 16px; }
+    .donut-wrap { display: flex; align-items: center; gap: 18px; flex-wrap: wrap; }
+    .donut-legend { display: flex; flex-direction: column; gap: 10px; font-size: 13px; }
+    .donut-legend .row { display: flex; align-items: center; gap: 8px; }
+    .donut-legend .row i { width: 11px; height: 11px; border-radius: 3px; }
+    .donut-legend .row .nm { color: var(--muted); }
+    .donut-legend .row .vv { margin-left: auto; font-weight: 600; font-variant-numeric: tabular-nums; padding-left: 18px; }
+
+    /* ---------- 弹窗 ---------- */
+    .modal-mask { position: fixed; inset: 0; background: rgba(15,23,42,.45); display: flex; align-items: center; justify-content: center; z-index: 50; }
+    .modal { background: #fff; border-radius: 14px; width: 540px; max-width: 92vw; padding: 24px; box-shadow: 0 20px 50px rgba(0,0,0,.25); }
+    .modal h3 { margin: 0 0 18px; font-size: 16px; }
     .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 20px; }
     .cond-line { display: grid; grid-template-columns: 1.2fr 1fr 1.4fr auto; gap: 8px; margin-bottom: 8px; }
-    .cond-line input, .cond-line select { padding: 8px; border: 1px solid var(--line); border-radius: 6px; font-size: 13px; }
-    .toast { position: fixed; top: 18px; right: 18px; background: #111827; color: #fff; padding: 10px 16px;
-             border-radius: 8px; font-size: 13px; z-index: 80; }
-    .empty { color: var(--muted); text-align: center; padding: 30px; }
+    .cond-line input, .cond-line select { padding: 8px 10px; border: 1px solid var(--line-strong); border-radius: 7px; font-size: 13px; }
+    .toast { position: fixed; top: 18px; right: 18px; background: #111827; color: #fff; padding: 11px 16px; border-radius: 9px; font-size: 13px; z-index: 80; box-shadow: var(--shadow); }
+    .empty { color: var(--muted); text-align: center; padding: 34px; }
     .toolbar { display: flex; gap: 10px; margin-bottom: 14px; align-items: center; flex-wrap: wrap; }
-    .toolbar select, .toolbar input { padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; }
-    pre.payload { background: #0f172a; color: #e2e8f0; padding: 10px; border-radius: 8px; font-size: 12px;
-                  max-height: 220px; overflow: auto; margin: 0; }
+    .toolbar select, .toolbar input { padding: 8px 11px; border: 1px solid var(--line-strong); border-radius: 8px; background: #fbfcfe; }
+    pre.payload { background: #0f172a; color: #e2e8f0; padding: 12px; border-radius: 9px; font-size: 12px; max-height: 240px; overflow: auto; margin: 0; }
+    .spin { display: inline-block; width: 16px; height: 16px; border: 2px solid var(--line-strong); border-top-color: var(--brand); border-radius: 50%; animation: sp .7s linear infinite; vertical-align: middle; margin-right: 8px; }
+    @keyframes sp { to { transform: rotate(360deg); } }
   </style>
 </head>
 <body>
@@ -110,10 +156,10 @@
   <div id="login" class="login-wrap">
     <div class="login-card">
       <h1>企业风控中台</h1>
-      <div class="sub">Risk Control Platform · v1.0.0</div>
+      <div class="sub">Risk Control Platform · v1.1</div>
       <div class="field">
         <label>用户名</label>
-        <input id="username" value="admin" autocomplete="username" />
+        <input id="username" value="qc_inspector" autocomplete="username" />
       </div>
       <div class="field">
         <label>密码</label>
@@ -132,18 +178,26 @@
   <!-- 主框架 -->
   <div id="app" class="shell hidden">
     <div class="sidebar">
-      <div class="logo">🛡 风控中台</div>
-      <a data-nav="dashboard" href="#/dashboard">数据看板</a>
-      <a data-nav="quality" href="#/quality">生产质量</a>
-      <a data-nav="policies" href="#/policies">策略管理</a>
-      <a data-nav="events" href="#/events">风险事件</a>
-      <a data-nav="blacklist" href="#/blacklist">黑白名单</a>
-      <a data-nav="audit" href="#/audit">审计日志</a>
+      <div class="logo"><span class="dot"></span>风控中台</div>
+      <div class="nav-group">总览</div>
+      <a data-nav="dashboard" href="#/dashboard"><span class="ic">▦</span>数据看板</a>
+      <a data-nav="quality" href="#/quality"><span class="ic">⚙</span>生产质量</a>
+      <div class="nav-group">风控配置</div>
+      <a data-nav="policies" href="#/policies"><span class="ic">⚑</span>策略管理</a>
+      <a data-nav="events" href="#/events"><span class="ic">◷</span>风险事件</a>
+      <a data-nav="blacklist" href="#/blacklist"><span class="ic">⊘</span>黑白名单</a>
+      <a data-nav="audit" href="#/audit"><span class="ic">☰</span>审计日志</a>
+      <div class="spacer"></div>
+      <div class="foot">v1.1 · 规则引擎 + 评分</div>
     </div>
     <div class="main">
       <div class="topbar">
-        <div class="who" id="who"></div>
-        <button class="btn ghost sm" onclick="doLogout()">退出登录</button>
+        <div class="pg" id="pgTitle">数据看板</div>
+        <div class="who">
+          <span id="who"></span>
+          <span class="avatar" id="avatar">U</span>
+          <button class="btn ghost sm" onclick="doLogout()">退出</button>
+        </div>
       </div>
       <div class="content" id="view"></div>
     </div>
@@ -156,6 +210,8 @@
 const API = "";
 let TOKEN = localStorage.getItem("rc_token") || "";
 let ME = null;
+const C = { brand: "#2f6df6", red: "#e23b3b", green: "#18a957", amber: "#d98a06", indigo: "#5b54e6",
+            line: "#e9edf3", ink: "#0f172a", muted: "#64748b", faint: "#94a3b8" };
 
 function authHeader() { return TOKEN ? { "Authorization": "Bearer " + TOKEN } : {}; }
 
@@ -177,21 +233,18 @@ async function api(path, opts = {}) {
 function toast(msg) {
   const t = document.getElementById("toast");
   t.textContent = msg; t.classList.remove("hidden");
-  setTimeout(() => t.classList.add("hidden"), 2200);
+  setTimeout(() => t.classList.add("hidden"), 2400);
 }
-
 function hasPerm(code) { return ME && (ME.is_superadmin || (ME.permissions || []).includes(code)); }
-
 function fmtTime(s) { if (!s) return "-"; return s.replace("T", " ").slice(0, 19); }
+function loading() { return '<div class="empty"><span class="spin"></span>加载中…</div>'; }
 
 async function doLogin() {
   const u = document.getElementById("username").value.trim();
   const p = document.getElementById("password").value;
   document.getElementById("loginErr").textContent = "";
   try {
-    const r = await api("/api/auth/login", {
-      method: "POST", body: JSON.stringify({ username: u, password: p }),
-    });
+    const r = await api("/api/auth/login", { method: "POST", body: JSON.stringify({ username: u, password: p }) });
     TOKEN = r.access_token; localStorage.setItem("rc_token", TOKEN); ME = r.user;
     enterApp();
   } catch (e) { document.getElementById("loginErr").textContent = e.message; }
@@ -206,55 +259,120 @@ function doLogout() {
 function enterApp() {
   document.getElementById("login").classList.add("hidden");
   document.getElementById("app").classList.remove("hidden");
-  document.getElementById("who").innerHTML = "当前用户：<b>" + ME.display_name + "</b>（" + ME.username + "）";
+  const dn = ME.display_name || ME.username;
+  document.getElementById("who").innerHTML = "当前用户 <b>" + dn + "</b>";
+  document.getElementById("avatar").textContent = (dn || "U").slice(0, 1);
   applyNavPermission();
   route();
 }
 
 function applyNavPermission() {
-  const map = {
-    dashboard: "dashboard:view", quality: "quality:view", policies: "risk:policy:view", events: "risk:event:view",
-    blacklist: "risk:blacklist:view", audit: "audit:view",
-  };
+  const map = { dashboard: "dashboard:view", quality: "quality:view", policies: "risk:policy:view",
+    events: "risk:event:view", blacklist: "risk:blacklist:view", audit: "audit:view" };
   document.querySelectorAll(".sidebar a").forEach(a => {
     const key = a.getAttribute("data-nav");
-    if (map[key] && !hasPerm(map[key])) a.classList.add("hidden");
-    else a.classList.remove("hidden");
+    if (map[key] && !hasPerm(map[key])) a.classList.add("hidden"); else a.classList.remove("hidden");
   });
 }
 
 // ---------------- 路由 ----------------
-const routes = {
-  dashboard: renderDashboard, quality: renderQuality, policies: renderPolicies, events: renderEvents,
-  blacklist: renderBlacklist, audit: renderAudit,
+const routes = { dashboard: renderDashboard, quality: renderQuality, policies: renderPolicies, events: renderEvents,
+  blacklist: renderBlacklist, audit: renderAudit };
+const pageMeta = {
+  dashboard: ["数据看板", "平台风险全景：事件量、决策分布与高频风险点"],
+  quality: ["生产质量风控", "按批次质检触发风控决策，拦截不合格品流入下道工序"],
+  policies: ["策略管理", "配置风控规则：条件、评分、动作与优先级"],
+  events: ["风险事件", "所有决策落库记录，可结合策略与黑白名单追溯"],
+  blacklist: ["黑白名单", "BLACK 命中即阻断，WHITE 可豁免阻断"],
+  audit: ["审计日志", "记录所有操作：操作人、模块、动作与时间"],
 };
 function route() {
   let h = location.hash.replace("#/", "") || "dashboard";
   if (!routes[h]) h = "dashboard";
-  document.querySelectorAll(".sidebar a").forEach(a => {
-    a.classList.toggle("active", a.getAttribute("data-nav") === h);
-  });
-  if (!hasPerm({ dashboard: "dashboard:view", quality: "quality:view", policies: "risk:policy:view", events: "risk:event:view", blacklist: "risk:blacklist:view", audit: "audit:view" }[h])) {
+  document.querySelectorAll(".sidebar a").forEach(a => a.classList.toggle("active", a.getAttribute("data-nav") === h));
+  const pm = pageMeta[h] || ["", ""];
+  document.getElementById("pgTitle").textContent = pm[0];
+  if (!hasPerm({ dashboard: "dashboard:view", quality: "quality:view", policies: "risk:policy:view",
+    events: "risk:event:view", blacklist: "risk:blacklist:view", audit: "audit:view" }[h])) {
     document.getElementById("view").innerHTML = '<div class="empty">无访问权限</div>'; return;
   }
   routes[h]();
 }
 window.addEventListener("hashchange", route);
 
+// ---------------- 图表 ----------------
+function svgTrend(trend) {
+  const days = Object.keys(trend).sort();
+  if (!days.length) return '<div class="empty">暂无数据</div>';
+  const W = 680, H = 260, pl = 42, pr = 16, pt = 18, pb = 30;
+  const plotW = W - pl - pr, plotH = H - pt - pb, base = pt + plotH;
+  const maxT = Math.max(1, ...days.map(d => trend[d].total || 0));
+  const n = days.length, step = n > 1 ? plotW / (n - 1) : 0;
+  const bw = Math.min(48, (plotW / n) * 0.55);
+  let grid = "", bars = "";
+  for (let g = 0; g <= 3; g++) {
+    const y = base - plotH * g / 3, val = Math.round(maxT * g / 3);
+    grid += `<line x1="${pl}" y1="${y}" x2="${W - pr}" y2="${y}" stroke="${C.line}" stroke-width="1"/>`;
+    grid += `<text x="${pl - 8}" y="${y + 4}" text-anchor="end" font-size="10" fill="${C.faint}">${val}</text>`;
+  }
+  days.forEach((d, i) => {
+    const x = n > 1 ? pl + step * i : pl + plotW / 2;
+    const b = trend[d], total = b.total || 0, block = b.block || 0;
+    const Ht = total / maxT * plotH, Hb = block / maxT * plotH;
+    const bx = x - bw / 2, yT = base - Ht;
+    bars += `<rect x="${bx}" y="${yT + Hb}" width="${bw}" height="${Math.max(0, Ht - Hb)}" rx="5" fill="${C.brand}"/>`;
+    if (Hb > 0) bars += `<rect x="${bx}" y="${yT}" width="${bw}" height="${Hb}" rx="5" fill="${C.red}"/>`;
+    if (total > 0) bars += `<text x="${x}" y="${yT - 6}" text-anchor="middle" font-size="11" font-weight="600" fill="${C.ink}">${total}</text>`;
+    bars += `<text x="${x}" y="${base + 16}" text-anchor="middle" font-size="11" fill="${C.muted}">${d.slice(5)}</text>`;
+  });
+  return `<svg viewBox="0 0 ${W} ${H}" width="100%" style="display:block">${grid}${bars}</svg>
+    <div class="legend">
+      <span class="lg"><i style="background:${C.brand}"></i>事件总数</span>
+      <span class="lg"><i style="background:${C.red}"></i>其中阻断</span>
+    </div>`;
+}
+function svgDonut(segments) {
+  const total = segments.reduce((s, x) => s + (x.value || 0), 0);
+  if (total === 0) return '<div class="empty">暂无数据</div>';
+  const r = 54, cx = 100, cy = 100, circ = 2 * Math.PI * r;
+  let off = 0, arcs = "";
+  segments.forEach(seg => {
+    const v = seg.value || 0; if (v <= 0) return;
+    const len = v / total * circ;
+    arcs += `<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${seg.color}" stroke-width="20"
+      stroke-dasharray="${len} ${circ - len}" stroke-dashoffset="${-off}" transform="rotate(-90 ${cx} ${cy})"/>`;
+    off += len;
+  });
+  const leg = segments.map(s => `<div class="row"><i style="background:${s.color}"></i>
+    <span class="nm">${s.label}</span><span class="vv">${s.value || 0}</span></div>`).join("");
+  return `<div class="donut-wrap">
+    <svg viewBox="0 0 200 200" width="170" height="170" style="display:block;flex-shrink:0">
+      <circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="${C.line}" stroke-width="20"/>
+      ${arcs}
+      <text x="${cx}" y="${cy - 4}" text-anchor="middle" font-size="26" font-weight="600" fill="${C.ink}">${total}</text>
+      <text x="${cx}" y="${cy + 17}" text-anchor="middle" font-size="12" fill="${C.muted}">总计</text>
+    </svg>
+    <div class="donut-legend">${leg}</div>
+  </div>`;
+}
+
 // ---------------- 看板 ----------------
 async function renderDashboard() {
   const v = document.getElementById("view");
-  v.innerHTML = '<h2 class="page-title">数据看板</h2><div class="empty">加载中…</div>';
+  v.innerHTML = `<div class="page-head"><h2 class="page-title">${pageMeta.dashboard[0]}</h2>
+    <p class="page-desc">${pageMeta.dashboard[1]}</p></div>${loading()}`;
   try {
     const d = await api("/api/dashboard/overview");
     const blockPct = d.total ? Math.round(d.blocked / d.total * 100) : 0;
+    const alert = Math.max(0, d.total - d.blocked - d.warned - d.allowed);
     v.innerHTML = `
-      <h2 class="page-title">数据看板</h2>
+      <div class="page-head"><h2 class="page-title">${pageMeta.dashboard[0]}</h2>
+        <p class="page-desc">${pageMeta.dashboard[1]}</p></div>
       <div class="cards">
-        <div class="stat"><div class="k">风险事件总数</div><div class="v">${d.total}</div></div>
-        <div class="stat red"><div class="k">阻断(BLOCK)</div><div class="v">${d.blocked}</div></div>
-        <div class="stat amber"><div class="k">预警(WARN)</div><div class="v">${d.warned}</div></div>
-        <div class="stat green"><div class="k">放行(ALLOW)</div><div class="v">${d.allowed}</div></div>
+        <div class="stat blue"><div class="k">风险事件总数</div><div class="v">${d.total}</div></div>
+        <div class="stat red"><div class="k">阻断 BLOCK</div><div class="v">${d.blocked}</div></div>
+        <div class="stat amber"><div class="k">预警 WARN</div><div class="v">${d.warned}</div></div>
+        <div class="stat green"><div class="k">放行 ALLOW</div><div class="v">${d.allowed}</div></div>
       </div>
       <div class="cards">
         <div class="stat"><div class="k">策略总数</div><div class="v">${d.policies_total}</div></div>
@@ -262,23 +380,22 @@ async function renderDashboard() {
         <div class="stat red"><div class="k">黑名单条目</div><div class="v">${d.black_total}</div></div>
         <div class="stat"><div class="k">阻断占比</div><div class="v">${blockPct}%</div></div>
       </div>
-      <div class="panel"><h3>近 7 天事件趋势</h3>${trendHtml(d.trend)}</div>
-      <div class="panel"><h3>高频触发策略 TOP</h3>${topHtml(d.top_rules)}</div>
-      <div class="panel"><h3>高频被阻断主体 TOP</h3>${topHtml(d.top_blocked)}</div>
-    `;
-  } catch (e) { v.innerHTML = '<div class="empty">' + e.message + '</div>'; }
-}
-function trendHtml(trend) {
-  const days = Object.keys(trend).sort();
-  if (!days.length) return '<div class="empty">暂无数据</div>';
-  const max = Math.max(1, ...days.map(d => trend[d].total));
-  return days.map(d => {
-    const b = trend[d]; const w = Math.round(b.total / max * 100);
-    const col = b.block ? "var(--red)" : (b.warn ? "var(--amber)" : "var(--brand)");
-    return `<div class="bar-row"><div class="name">${d}</div>
-      <div class="bar-track"><div class="bar-fill" style="width:${w}%;background:${col}"></div></div>
-      <div class="num">${b.total}</div></div>`;
-  }).join("");
+      <div class="grid2">
+        <div class="panel"><h3>近 7 天事件趋势</h3>
+          <p class="ph-sub">每日事件总量与阻断量对比</p>${svgTrend(d.trend)}</div>
+        <div class="panel"><h3>决策分布</h3>
+          <p class="ph-sub">全部风险的处置结果占比</p>${svgDonut([
+            { label: "放行 ALLOW", value: d.allowed, color: C.green },
+            { label: "预警 WARN", value: d.warned, color: C.amber },
+            { label: "阻断 BLOCK", value: d.blocked, color: C.red },
+            { label: "告警 ALERT", value: alert, color: C.indigo },
+          ])}</div>
+      </div>
+      <div class="grid2">
+        <div class="panel"><h3>高频触发策略 TOP</h3><p class="ph-sub">最常被命中的风控规则</p>${topHtml(d.top_rules)}</div>
+        <div class="panel"><h3>高频被阻断主体 TOP</h3><p class="ph-sub">被拦截最多的对象</p>${topHtml(d.top_blocked)}</div>
+      </div>`;
+  } catch (e) { v.innerHTML = `<div class="empty">${e.message}</div>`; }
 }
 function topHtml(arr) {
   if (!arr || !arr.length) return '<div class="empty">暂无数据</div>';
@@ -294,17 +411,18 @@ function topHtml(arr) {
 // ---------------- 策略 ----------------
 async function renderPolicies() {
   const v = document.getElementById("view");
-  v.innerHTML = '<h2 class="page-title">策略管理</h2><div class="empty">加载中…</div>';
+  v.innerHTML = `<div class="page-head"><h2 class="page-title">${pageMeta.policies[0]}</h2>
+    <p class="page-desc">${pageMeta.policies[1]}</p></div>${loading()}`;
   try {
     const list = await api("/api/policies");
     const canManage = hasPerm("risk:policy:manage");
+    const actTag = a => (a === "BLOCK" || a === "ADD_BLACKLIST") ? "BLOCK" : (a === "WARN" ? "WARN" : "ALLOW");
     let rows = list.map(p => `
       <tr>
-        <td>${p.name}<br/><span style="color:var(--muted)">${p.description || ""}</span></td>
+        <td>${p.name}<br/><span class="soft">${p.description || ""}</span></td>
         <td>${p.event_type}</td>
-        <td><span class="tag ${p.action === "BLOCK" || p.action === "ADD_BLACKLIST" ? "BLOCK" : (p.action === "WARN" ? "WARN" : "ALLOW")}">${p.action}</span></td>
-        <td>${p.risk_score}</td>
-        <td>${p.priority}</td>
+        <td><span class="tag ${actTag(p.action)}">${p.action}</span></td>
+        <td>${p.risk_score}</td><td>${p.priority}</td>
         <td><span class="tag ${p.enabled ? "on" : "off"}">${p.enabled ? "启用" : "停用"}</span></td>
         <td>${canManage ? `
           <button class="btn ghost sm" onclick="editPolicy(${p.id})">编辑</button>
@@ -312,67 +430,57 @@ async function renderPolicies() {
           <button class="btn danger sm" onclick="delPolicy(${p.id})">删除</button>` : "-"}</td>
       </tr>`).join("");
     v.innerHTML = `
-      <h2 class="page-title">策略管理</h2>
+      <div class="page-head"><h2 class="page-title">${pageMeta.policies[0]}</h2>
+        <p class="page-desc">${pageMeta.policies[1]}</p></div>
       <div class="toolbar">${canManage ? '<button class="btn sm" onclick="newPolicy()">+ 新建策略</button>' : ""}
-        <span style="color:var(--muted)">条件为 AND 关系；命中后累计评分并执行动作（ALLOW/WARN/BLOCK/ADD_BLACKLIST）。</span></div>
-      <div class="panel"><table>
+        <span style="color:var(--muted)">条件为 AND 关系；命中后累计评分并执行动作。</span></div>
+      <div class="panel"><div class="table-wrap"><table>
         <thead><tr><th>名称</th><th>事件类型</th><th>动作</th><th>评分</th><th>优先级</th><th>状态</th><th>操作</th></tr></thead>
         <tbody>${rows || '<tr><td colspan="7" class="empty">暂无策略</td></tr>'}</tbody>
-      </table></div>`;
-  } catch (e) { v.innerHTML = '<div class="empty">' + e.message + '</div>'; }
+      </table></div></div>`;
+  } catch (e) { v.innerHTML = `<div class="empty">${e.message}</div>`; }
 }
 
 let policyDraft = null;
 function condRow(c = { field: "", op: "eq", value: "" }) {
   return `<div class="cond-line">
     <input placeholder="字段" value="${c.field}" data-f="field" />
-    <select data-f="op">
-      ${["eq","ne","gt","gte","lt","lte","in","not_in","contains","regex","exists"].map(o =>
-        `<option ${o === c.op ? "selected" : ""}>${o}</option>`).join("")}
-    </select>
+    <select data-f="op">${["eq","ne","gt","gte","lt","lte","in","not_in","contains","regex","exists"]
+      .map(o => `<option ${o === c.op ? "selected" : ""}>${o}</option>`).join("")}</select>
     <input placeholder="值(数组用逗号分隔)" value="${c.value === null || c.value === undefined ? "" : c.value}" data-f="value" />
     <button class="btn danger sm" onclick="this.parentNode.remove()">×</button>
   </div>`;
 }
 function policyModal(p) {
-  policyDraft = p || { name: "", description: "", event_type: "ALL", enabled: true, priority: 100, action: "WARN", risk_score: 50, conditions: [{ field: "", op: "eq", value: "" }] };
+  policyDraft = p || { name: "", description: "", event_type: "ALL", enabled: true, priority: 100, action: "WARN", risk_score: 50,
+    conditions: [{ field: "", op: "eq", value: "" }] };
   const html = `
-    <div class="modal-mask" onclick="if(event.target===this)closeModal()">
-      <div class="modal">
-        <h3>${p ? "编辑策略" : "新建策略"}</h3>
-        <div class="field"><label>名称</label><input id="p_name" value="${policyDraft.name}" /></div>
-        <div class="field"><label>描述</label><input id="p_desc" value="${policyDraft.description || ""}" /></div>
-        <div class="row2">
-          <div class="field"><label>事件类型</label>
-            <select id="p_event">${["ALL","LOGIN","KNOWLEDGE_ACCESS","EXPORT","IMPORT"].map(t =>
-              `<option ${t === policyDraft.event_type ? "selected" : ""}>${t}</option>`).join("")}</select></div>
-          <div class="field"><label>动作</label>
-            <select id="p_action">${["ALLOW","WARN","BLOCK","ADD_BLACKLIST"].map(t =>
-              `<option ${t === policyDraft.action ? "selected" : ""}>${t}</option>`).join("")}</select></div>
-        </div>
-        <div class="row2">
-          <div class="field"><label>风险评分</label><input id="p_score" type="number" value="${policyDraft.risk_score}" /></div>
-          <div class="field"><label>优先级(越小越先)</label><input id="p_prio" type="number" value="${policyDraft.priority}" /></div>
-        </div>
-        <div class="field"><label>条件（AND）</label><div id="condBox">${policyDraft.conditions.map(condRow).join("")}</div>
-          <button class="btn ghost sm" onclick="addCond()">+ 添加条件</button></div>
-        <div class="modal-actions">
-          <button class="btn ghost" onclick="closeModal()">取消</button>
-          <button class="btn" onclick="savePolicy(${p ? p.id : ""})">保存</button>
-        </div>
+    <div class="modal-mask" onclick="if(event.target===this)closeModal()"><div class="modal">
+      <h3>${p ? "编辑策略" : "新建策略"}</h3>
+      <div class="field"><label>名称</label><input id="p_name" value="${policyDraft.name}" /></div>
+      <div class="field"><label>描述</label><input id="p_desc" value="${policyDraft.description || ""}" /></div>
+      <div class="row2">
+        <div class="field"><label>事件类型</label><select id="p_event">${["ALL","LOGIN","KNOWLEDGE_ACCESS","EXPORT","IMPORT"]
+          .map(t => `<option ${t === policyDraft.event_type ? "selected" : ""}>${t}</option>`).join("")}</select></div>
+        <div class="field"><label>动作</label><select id="p_action">${["ALLOW","WARN","BLOCK","ADD_BLACKLIST"]
+          .map(t => `<option ${t === policyDraft.action ? "selected" : ""}>${t}</option>`).join("")}</select></div>
       </div>
-    </div>`;
+      <div class="row2">
+        <div class="field"><label>风险评分</label><input id="p_score" type="number" value="${policyDraft.risk_score}" /></div>
+        <div class="field"><label>优先级(越小越先)</label><input id="p_prio" type="number" value="${policyDraft.priority}" /></div>
+      </div>
+      <div class="field"><label>条件（AND）</label><div id="condBox">${policyDraft.conditions.map(condRow).join("")}</div>
+        <button class="btn ghost sm" onclick="addCond()">+ 添加条件</button></div>
+      <div class="modal-actions"><button class="btn ghost" onclick="closeModal()">取消</button>
+        <button class="btn" onclick="savePolicy(${p ? p.id : ""})">保存</button></div>
+    </div></div>`;
   document.getElementById("modalRoot").innerHTML = html;
 }
-function addCond() {
-  document.getElementById("condBox").insertAdjacentHTML("beforeend", condRow());
-}
+function addCond() { document.getElementById("condBox").insertAdjacentHTML("beforeend", condRow()); }
 function newPolicy() { policyModal(null); }
 function editPolicy(id) {
-  api("/api/policies").then(list => {
-    const p = list.find(x => x.id === id);
-    if (p) policyModal(p);
-  }).catch(e => toast(e.message));
+  api("/api/policies").then(list => { const p = list.find(x => x.id === id); if (p) policyModal(p); })
+    .catch(e => toast(e.message));
 }
 async function savePolicy(id) {
   const conds = [...document.querySelectorAll("#condBox .cond-line")].map(row => {
@@ -384,16 +492,10 @@ async function savePolicy(id) {
     else if (op === "exists") val = val === "true" || val === "1";
     return { field: f, op, value: val };
   }).filter(c => c.field);
-  const body = {
-    name: document.getElementById("p_name").value.trim(),
-    description: document.getElementById("p_desc").value,
-    event_type: document.getElementById("p_event").value,
-    action: document.getElementById("p_action").value,
-    risk_score: Number(document.getElementById("p_score").value),
-    priority: Number(document.getElementById("p_prio").value),
-    enabled: true,
-    conditions: conds,
-  };
+  const body = { name: document.getElementById("p_name").value.trim(), description: document.getElementById("p_desc").value,
+    event_type: document.getElementById("p_event").value, action: document.getElementById("p_action").value,
+    risk_score: Number(document.getElementById("p_score").value), priority: Number(document.getElementById("p_prio").value),
+    enabled: true, conditions: conds };
   try {
     if (id) await api("/api/policies/" + id, { method: "PUT", body: JSON.stringify(body) });
     else await api("/api/policies", { method: "POST", body: JSON.stringify(body) });
@@ -413,50 +515,44 @@ async function delPolicy(id) {
 // ---------------- 事件 ----------------
 async function renderEvents() {
   const v = document.getElementById("view");
-  v.innerHTML = '<h2 class="page-title">风险事件</h2><div class="empty">加载中…</div>';
+  v.innerHTML = `<div class="page-head"><h2 class="page-title">${pageMeta.events[0]}</h2>
+    <p class="page-desc">${pageMeta.events[1]}</p></div>${loading()}`;
   try {
     const list = await api("/api/risk/events");
-    let rows = list.map(e => `
-      <tr>
-        <td><span class="tag ${e.decision}">${e.decision}</span></td>
-        <td>${e.event_type}</td>
-        <td>${e.score}</td>
-        <td>${e.actor || "-"}</td>
-        <td>${e.ip || "-"}</td>
-        <td>${(e.triggered_rule_ids || []).join(", ") || "-"}</td>
-        <td>${fmtTime(e.created_at)}</td>
-        <td><button class="btn ghost sm" onclick="showPayload(${e.id})">详情</button></td>
-      </tr>`).join("");
+    const rowHtml = e => `<tr>
+      <td><span class="tag ${e.decision}">${e.decision}</span></td><td>${e.event_type}</td><td>${e.score}</td>
+      <td>${e.actor || "-"}</td><td>${e.ip || "-"}</td>
+      <td>${(e.triggered_rule_ids || []).join(", ") || "-"}</td><td>${fmtTime(e.created_at)}</td>
+      <td><button class="btn ghost sm" onclick="showPayload(${e.id})">详情</button></td></tr>`;
     v.innerHTML = `
-      <h2 class="page-title">风险事件</h2>
-      <div class="toolbar"><input id="ev_filter" placeholder="事件类型过滤，如 LOGIN" oninput="filterEvents()" style="width:200px"/>
+      <div class="page-head"><h2 class="page-title">${pageMeta.events[0]}</h2>
+        <p class="page-desc">${pageMeta.events[1]}</p></div>
+      <div class="toolbar"><input id="ev_filter" placeholder="事件类型过滤，如 LOGIN" oninput="filterEvents()" style="width:220px"/>
         <span style="color:var(--muted)">所有决策都会落库，可结合策略与黑白名单追溯。</span></div>
-      <div class="panel"><table>
+      <div class="panel"><div class="table-wrap"><table>
         <thead><tr><th>决策</th><th>事件</th><th>评分</th><th>主体</th><th>IP</th><th>触发策略</th><th>时间</th><th>操作</th></tr></thead>
-        <tbody id="evBody">${rows || '<tr><td colspan="8" class="empty">暂无事件</td></tr>'}</tbody>
-      </table></div>`;
+        <tbody id="evBody">${list.map(rowHtml).join("") || '<tr><td colspan="8" class="empty">暂无事件</td></tr>'}</tbody>
+      </table></div></div>`;
     window.__events = list;
-  } catch (e) { v.innerHTML = '<div class="empty">' + e.message + '</div>'; }
+  } catch (e) { v.innerHTML = `<div class="empty">${e.message}</div>`; }
 }
 function filterEvents() {
   const q = (document.getElementById("ev_filter").value || "").trim().toUpperCase();
   const list = window.__events || [];
   const f = q ? list.filter(e => e.event_type.toUpperCase().includes(q)) : list;
-  document.getElementById("evBody").innerHTML = f.map(e => `
-    <tr><td><span class="tag ${e.decision}">${e.decision}</span></td><td>${e.event_type}</td>
-      <td>${e.score}</td><td>${e.actor || "-"}</td><td>${e.ip || "-"}</td>
-      <td>${(e.triggered_rule_ids || []).join(", ") || "-"}</td><td>${fmtTime(e.created_at)}</td>
-      <td><button class="btn ghost sm" onclick="showPayload(${e.id})">详情</button></td></tr>`).join("");
+  document.getElementById("evBody").innerHTML = f.map(e => `<tr><td><span class="tag ${e.decision}">${e.decision}</span></td>
+    <td>${e.event_type}</td><td>${e.score}</td><td>${e.actor || "-"}</td><td>${e.ip || "-"}</td>
+    <td>${(e.triggered_rule_ids || []).join(", ") || "-"}</td><td>${fmtTime(e.created_at)}</td>
+    <td><button class="btn ghost sm" onclick="showPayload(${e.id})">详情</button></td></tr>`).join("");
 }
 function showPayload(id) {
-  const e = (window.__events || []).find(x => x.id === id);
-  if (!e) return;
+  const e = (window.__events || []).find(x => x.id === id); if (!e) return;
   document.getElementById("modalRoot").innerHTML = `
-    <div class="modal-mask" onclick="if(event.target===this)closeModal()">
-      <div class="modal"><h3>事件详情 #${e.id}</h3>
+    <div class="modal-mask" onclick="if(event.target===this)closeModal()"><div class="modal">
+      <h3>事件详情 #${e.id}</h3>
       <p>决策：<span class="tag ${e.decision}">${e.decision}</span> · 评分：${e.score} · 请求ID：${e.request_id || "-"}</p>
       <p>告警：${(e.alerts || []).join("；") || "-"}</p>
-      <h3>Payload</h3><pre class="payload">${JSON.stringify(e.payload, null, 2)}</pre>
+      <h3 style="margin-top:14px">Payload</h3><pre class="payload">${JSON.stringify(e.payload, null, 2)}</pre>
       <div class="modal-actions"><button class="btn" onclick="closeModal()">关闭</button></div>
     </div></div>`;
 }
@@ -464,24 +560,25 @@ function showPayload(id) {
 // ---------------- 黑白名单 ----------------
 async function renderBlacklist() {
   const v = document.getElementById("view");
-  v.innerHTML = '<h2 class="page-title">黑白名单</h2><div class="empty">加载中…</div>';
+  v.innerHTML = `<div class="page-head"><h2 class="page-title">${pageMeta.blacklist[0]}</h2>
+    <p class="page-desc">${pageMeta.blacklist[1]}</p></div>${loading()}`;
   try {
     const list = await api("/api/blacklist");
     const canManage = hasPerm("risk:blacklist:manage");
     let rows = list.map(e => `
-      <tr><td><span class="tag ${e.list_type}">${e.list_type}</span></td>
-        <td>${e.entity_type}</td><td>${e.value}</td><td>${e.reason || "-"}</td>
-        <td>${e.source}</td><td>${fmtTime(e.created_at)}</td>
+      <tr><td><span class="tag ${e.list_type}">${e.list_type}</span></td><td>${e.entity_type}</td><td>${e.value}</td>
+        <td>${e.reason || "-"}</td><td>${e.source}</td><td>${fmtTime(e.created_at)}</td>
         <td>${canManage ? `<button class="btn danger sm" onclick="delEntry(${e.id})">移除</button>` : "-"}</td></tr>`).join("");
     v.innerHTML = `
-      <h2 class="page-title">黑白名单</h2>
+      <div class="page-head"><h2 class="page-title">${pageMeta.blacklist[0]}</h2>
+        <p class="page-desc">${pageMeta.blacklist[1]}</p></div>
       <div class="toolbar">${canManage ? '<button class="btn sm" onclick="newEntry()">+ 新增</button>' : ""}
         <span style="color:var(--muted)">BLACK 命中即阻断；WHITE 命中可豁免阻断。</span></div>
-      <div class="panel"><table>
+      <div class="panel"><div class="table-wrap"><table>
         <thead><tr><th>类型</th><th>实体</th><th>值</th><th>原因</th><th>来源</th><th>创建时间</th><th>操作</th></tr></thead>
         <tbody>${rows || '<tr><td colspan="7" class="empty">暂无记录</td></tr>'}</tbody>
-      </table></div>`;
-  } catch (e) { v.innerHTML = '<div class="empty">' + e.message + '</div>'; }
+      </table></div></div>`;
+  } catch (e) { v.innerHTML = `<div class="empty">${e.message}</div>`; }
 }
 function newEntry() {
   document.getElementById("modalRoot").innerHTML = `
@@ -513,27 +610,29 @@ async function delEntry(id) {
 // ---------------- 审计 ----------------
 async function renderAudit() {
   const v = document.getElementById("view");
-  v.innerHTML = '<h2 class="page-title">审计日志</h2><div class="empty">加载中…</div>';
+  v.innerHTML = `<div class="page-head"><h2 class="page-title">${pageMeta.audit[0]}</h2>
+    <p class="page-desc">${pageMeta.audit[1]}</p></div>${loading()}`;
   try {
     const list = await api("/api/audit/logs");
-    let rows = list.map(l => `
-      <tr><td>${l.username}</td><td>${l.module}</td><td>${l.action}</td>
-        <td>${l.object_type || "-"}${l.object_id ? " #" + l.object_id : ""}</td>
-        <td>${l.ip || "-"}</td><td>${fmtTime(l.created_at)}</td></tr>`).join("");
-    v.innerHTML = `<h2 class="page-title">审计日志</h2>
-      <div class="panel"><table><thead><tr><th>操作人</th><th>模块</th><th>动作</th><th>对象</th><th>IP</th><th>时间</th></tr></thead>
-      <tbody>${rows || '<tr><td colspan="6" class="empty">暂无日志</td></tr>'}</tbody></table></div>`;
-  } catch (e) { v.innerHTML = '<div class="empty">' + e.message + '</div>'; }
+    let rows = list.map(l => `<tr><td>${l.username}</td><td>${l.module}</td><td>${l.action}</td>
+      <td>${l.object_type || "-"}${l.object_id ? " #" + l.object_id : ""}</td><td>${l.ip || "-"}</td><td>${fmtTime(l.created_at)}</td></tr>`).join("");
+    v.innerHTML = `<div class="page-head"><h2 class="page-title">${pageMeta.audit[0]}</h2>
+      <p class="page-desc">${pageMeta.audit[1]}</p></div>
+      <div class="panel"><div class="table-wrap"><table>
+        <thead><tr><th>操作人</th><th>模块</th><th>动作</th><th>对象</th><th>IP</th><th>时间</th></tr></thead>
+        <tbody>${rows || '<tr><td colspan="6" class="empty">暂无日志</td></tr>'}</tbody>
+      </table></div></div>`;
+  } catch (e) { v.innerHTML = `<div class="empty">${e.message}</div>`; }
 }
 
 // ---------------- 生产质量 ----------------
 async function renderQuality() {
   const v = document.getElementById("view");
-  v.innerHTML = '<h2 class="page-title">生产质量风控</h2><div class="empty">加载中…</div>';
+  v.innerHTML = `<div class="page-head"><h2 class="page-title">${pageMeta.quality[0]}</h2>
+    <p class="page-desc">${pageMeta.quality[1]}</p></div>${loading()}`;
   try {
     const [stats, batches, insps] = await Promise.all([
-      api("/api/quality/stats"), api("/api/quality/batches"), api("/api/quality/inspections"),
-    ]);
+      api("/api/quality/stats"), api("/api/quality/batches"), api("/api/quality/inspections")]);
     const canManage = hasPerm("quality:manage");
     const batchRows = batches.map(b => `
       <tr>
@@ -548,11 +647,11 @@ async function renderQuality() {
         <td>${r.inspected_qty}</td><td>${r.failed_qty}</td><td>${r.defect_rate}%</td>
         <td><span class="tag ${r.result === "PASS" ? "on" : (r.result === "FAIL" ? "BLOCK" : "WARN")}">${r.result}</span></td>
         <td><span class="tag ${r.risk_decision}">${r.risk_decision}</span></td>
-        <td>${(r.triggered_rules || []).join("；") || "-"}</td>
-        <td>${fmtTime(r.created_at)}</td>
+        <td>${(r.triggered_rules || []).join("；") || "-"}</td><td>${fmtTime(r.created_at)}</td>
       </tr>`).join("");
     v.innerHTML = `
-      <h2 class="page-title">生产质量风控</h2>
+      <div class="page-head"><h2 class="page-title">${pageMeta.quality[0]}</h2>
+        <p class="page-desc">${pageMeta.quality[1]}</p></div>
       <div class="cards">
         <div class="stat"><div class="k">批次总数</div><div class="v">${stats.total_batches}</div></div>
         <div class="stat"><div class="k">待检</div><div class="v">${stats.pending}</div></div>
@@ -565,15 +664,32 @@ async function renderQuality() {
         <div class="stat amber"><div class="k">漏检告警</div><div class="v">${stats.insp_alert}</div></div>
         <div class="stat green"><div class="k">质检放行</div><div class="v">${stats.insp_pass}</div></div>
       </div>
+      <div class="grid2">
+        <div class="panel"><h3>质检决策分布</h3><p class="ph-sub">各批次质检结果的处置占比</p>${svgDonut([
+          { label: "放行 PASS", value: stats.insp_pass, color: C.green },
+          { label: "预警 WARN", value: stats.insp_warn, color: C.amber },
+          { label: "漏检 ALERT", value: stats.insp_alert, color: C.indigo },
+          { label: "阻断 BLOCK", value: stats.insp_block, color: C.red },
+        ])}</div>
+        <div class="panel"><h3>批次状态构成</h3><p class="ph-sub">台账中批次所处的状态</p>${svgDonut([
+          { label: "已检", value: stats.inspected, color: C.green },
+          { label: "待检", value: stats.pending, color: C.amber },
+          { label: "阻断", value: stats.blocked, color: C.red },
+        ])}</div>
+      </div>
       <div class="panel"><h3>生产批次</h3>
         <div class="toolbar">${canManage ? '<button class="btn sm" onclick="newBatch()">+ 新建批次</button>' : ""}
           <span style="color:var(--muted)">批次登记后录入质检即触发风控决策（不合格率/抽检/漏检/产线连续不合格）。</span></div>
-        <table><thead><tr><th>批次号</th><th>产线</th><th>产品</th><th>计划</th><th>实际</th><th>状态</th><th>操作</th></tr></thead>
-          <tbody>${batchRows || '<tr><td colspan="7" class="empty">暂无批次</td></tr>'}</tbody></table></div>
+        <div class="table-wrap"><table>
+          <thead><tr><th>批次号</th><th>产线</th><th>产品</th><th>计划</th><th>实际</th><th>状态</th><th>操作</th></tr></thead>
+          <tbody>${batchRows || '<tr><td colspan="7" class="empty">暂无批次</td></tr>'}</tbody>
+        </table></div></div>
       <div class="panel"><h3>质检记录</h3>
-        <table><thead><tr><th>批次号</th><th>产线</th><th>质检员</th><th>抽检数</th><th>不合格</th><th>不合格率</th><th>结果</th><th>决策</th><th>命中策略</th><th>时间</th></tr></thead>
-          <tbody>${inspRows || '<tr><td colspan="10" class="empty">暂无质检记录</td></tr>'}</tbody></table></div>`;
-  } catch (e) { v.innerHTML = '<div class="empty">' + e.message + '</div>'; }
+        <div class="table-wrap"><table>
+          <thead><tr><th>批次号</th><th>产线</th><th>质检员</th><th>抽检数</th><th>不合格</th><th>不合格率</th><th>结果</th><th>决策</th><th>命中策略</th><th>时间</th></tr></thead>
+          <tbody>${inspRows || '<tr><td colspan="10" class="empty">暂无质检记录</td></tr>'}</tbody>
+        </table></div></div>`;
+  } catch (e) { v.innerHTML = `<div class="empty">${e.message}</div>`; }
 }
 function newBatch() {
   document.getElementById("modalRoot").innerHTML = `
@@ -593,13 +709,9 @@ function newBatch() {
     </div></div>`;
 }
 async function saveBatch() {
-  const body = {
-    batch_no: document.getElementById("b_no").value.trim(),
-    product_line: document.getElementById("b_line").value.trim(),
-    product_name: document.getElementById("b_name").value.trim(),
-    plan_qty: Number(document.getElementById("b_plan").value || 0),
-    produced_qty: Number(document.getElementById("b_prod").value || 0),
-  };
+  const body = { batch_no: document.getElementById("b_no").value.trim(), product_line: document.getElementById("b_line").value.trim(),
+    product_name: document.getElementById("b_name").value.trim(), plan_qty: Number(document.getElementById("b_plan").value || 0),
+    produced_qty: Number(document.getElementById("b_prod").value || 0) };
   if (!body.batch_no || !body.product_line) { toast("批次号与产线必填"); return; }
   try { await api("/api/quality/batches", { method: "POST", body: JSON.stringify(body) }); closeModal(); renderQuality(); }
   catch (e) { toast(e.message); }
@@ -618,7 +730,8 @@ function openInspect(batchNo, line) {
         <div class="field"><label>质检员</label><input id="i_inspector" value="${ME ? ME.display_name : ""}" /></div>
         <div class="field"><label>抽样方式</label><select id="i_mode"><option>SAMPLE</option><option>FULL</option></select></div>
       </div>
-      <div class="field"><label><input type="checkbox" id="i_leak" /> 漏检（未检就流转）</label></div>
+      <div class="field"><label style="display:flex;align-items:center;gap:8px;cursor:pointer">
+        <input type="checkbox" id="i_leak" style="width:auto" /> 漏检（未检就流转）</label></div>
       <div class="modal-actions"><button class="btn ghost" onclick="closeModal()">取消</button>
         <button class="btn" onclick="saveInspect()">提交并决策</button></div>
     </div></div>`;
@@ -629,13 +742,9 @@ async function saveInspect() {
   const leak = document.getElementById("i_leak").checked;
   if (insp <= 0 && !leak) { toast("抽检数量需大于0，或勾选漏检"); return; }
   if (!leak && fail > insp) { toast("不合格数不能大于抽检数"); return; }
-  const body = {
-    batch_no: document.getElementById("i_no").value.trim(),
-    product_line: document.getElementById("i_line").value.trim(),
-    inspector: document.getElementById("i_inspector").value.trim(),
-    inspected_qty: insp, failed_qty: fail,
-    sample_mode: document.getElementById("i_mode").value, is_leak: leak,
-  };
+  const body = { batch_no: document.getElementById("i_no").value.trim(), product_line: document.getElementById("i_line").value.trim(),
+    inspector: document.getElementById("i_inspector").value.trim(), inspected_qty: insp, failed_qty: fail,
+    sample_mode: document.getElementById("i_mode").value, is_leak: leak };
   try {
     const r = await api("/api/quality/inspections", { method: "POST", body: JSON.stringify(body) });
     closeModal();
@@ -649,10 +758,8 @@ function closeModal() { document.getElementById("modalRoot").innerHTML = ""; }
 // ---------------- 启动 ----------------
 (async function init() {
   if (!TOKEN) return;
-  try {
-    const me = await api("/api/auth/me");
-    ME = me; enterApp();
-  } catch (e) { /* token 失效，停留登录页 */ }
+  try { const me = await api("/api/auth/me"); ME = me; enterApp(); }
+  catch (e) { /* token 失效，停留登录页 */ }
 })();
 </script>
 </body>
