@@ -1,0 +1,659 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>企业风控中台</title>
+  <style>
+    :root {
+      --bg: #f5f7fa; --panel: #ffffff; --ink: #1f2937; --muted: #6b7280;
+      --line: #e5e7eb; --brand: #2563eb; --brand-soft: #eff6ff;
+      --red: #dc2626; --red-soft: #fef2f2; --green: #16a34a; --green-soft: #f0fdf4;
+      --amber: #d97706; --amber-soft: #fffbeb;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: "Segoe UI", "Microsoft YaHei", system-ui, sans-serif;
+           background: var(--bg); color: var(--ink); font-size: 14px; }
+    button { font-family: inherit; cursor: pointer; }
+    .hidden { display: none !important; }
+
+    /* 登录 */
+    .login-wrap { min-height: 100vh; display: flex; align-items: center; justify-content: center;
+                  background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 60%, #0ea5e9 100%); }
+    .login-card { width: 360px; background: #fff; border-radius: 14px; padding: 32px;
+                  box-shadow: 0 20px 50px rgba(0,0,0,.25); }
+    .login-card h1 { font-size: 20px; margin: 0 0 4px; color: var(--brand); }
+    .login-card .sub { color: var(--muted); margin-bottom: 22px; font-size: 13px; }
+    .field { margin-bottom: 14px; }
+    .field label { display: block; margin-bottom: 6px; color: var(--muted); font-size: 13px; }
+    .field input, .field select, .field textarea {
+      width: 100%; padding: 10px 12px; border: 1px solid var(--line); border-radius: 8px; font-size: 14px; }
+    .btn { background: var(--brand); color: #fff; border: none; padding: 11px 14px;
+           border-radius: 8px; font-size: 14px; width: 100%; }
+    .btn:hover { filter: brightness(1.05); }
+    .btn.sm { width: auto; padding: 6px 12px; font-size: 13px; }
+    .btn.ghost { background: #fff; color: var(--brand); border: 1px solid var(--brand); }
+    .btn.danger { background: var(--red); }
+    .btn.amber { background: var(--amber); }
+    .err { color: var(--red); font-size: 13px; min-height: 18px; margin-top: 8px; }
+    .demo-accounts { margin-top: 18px; font-size: 12px; color: var(--muted);
+                     background: var(--brand-soft); padding: 10px; border-radius: 8px; line-height: 1.7; }
+
+    /* 布局 */
+    .shell { display: flex; min-height: 100vh; }
+    .sidebar { width: 210px; background: #0f172a; color: #cbd5e1; padding: 18px 0; flex-shrink: 0; }
+    .sidebar .logo { color: #fff; font-weight: 700; font-size: 16px; padding: 0 20px 18px; }
+    .sidebar a { display: block; padding: 11px 20px; color: #cbd5e1; text-decoration: none; font-size: 14px; }
+    .sidebar a:hover, .sidebar a.active { background: #1e293b; color: #fff; }
+    .main { flex: 1; display: flex; flex-direction: column; }
+    .topbar { height: 56px; background: #fff; border-bottom: 1px solid var(--line);
+              display: flex; align-items: center; justify-content: space-between; padding: 0 22px; }
+    .topbar .who { color: var(--muted); font-size: 13px; }
+    .topbar .who b { color: var(--ink); }
+    .content { padding: 22px; }
+    .page-title { font-size: 18px; font-weight: 600; margin: 0 0 16px; }
+
+    /* 卡片/统计 */
+    .cards { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; margin-bottom: 18px; }
+    .stat { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+    .stat .k { color: var(--muted); font-size: 13px; }
+    .stat .v { font-size: 26px; font-weight: 700; margin-top: 6px; }
+    .stat.red .v { color: var(--red); } .stat.green .v { color: var(--green); }
+    .stat.amber .v { color: var(--amber); }
+
+    .panel { background: var(--panel); border: 1px solid var(--line); border-radius: 12px; padding: 18px; margin-bottom: 18px; }
+    .panel h3 { margin: 0 0 14px; font-size: 15px; }
+
+    /* 表格 */
+    table { width: 100%; border-collapse: collapse; }
+    th, td { text-align: left; padding: 10px 12px; border-bottom: 1px solid var(--line); font-size: 13px; }
+    th { color: var(--muted); font-weight: 600; background: #fafafa; }
+    tr:hover td { background: #fcfdff; }
+
+    .tag { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 12px; font-weight: 600; }
+    .tag.ALLOW { background: var(--green-soft); color: var(--green); }
+    .tag.WARN { background: var(--amber-soft); color: var(--amber); }
+    .tag.ALERT { background: #fef3c7; color: #b45309; }
+    .tag.BLOCK { background: var(--red-soft); color: var(--red); }
+    .tag.BLACK { background: var(--red-soft); color: var(--red); }
+    .tag.WHITE { background: var(--green-soft); color: var(--green); }
+    .tag.on { background: var(--green-soft); color: var(--green); }
+    .tag.off { background: #f1f5f9; color: var(--muted); }
+
+    /* 柱状条 */
+    .bar-row { display: flex; align-items: center; gap: 10px; margin-bottom: 8px; font-size: 13px; }
+    .bar-row .name { width: 150px; color: var(--muted); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .bar-track { flex: 1; background: #f1f5f9; border-radius: 6px; height: 16px; position: relative; }
+    .bar-fill { height: 16px; border-radius: 6px; background: var(--brand); }
+    .bar-row .num { width: 38px; text-align: right; }
+
+    /* 弹窗 */
+    .modal-mask { position: fixed; inset: 0; background: rgba(15,23,42,.45); display: flex;
+                  align-items: center; justify-content: center; z-index: 50; }
+    .modal { background: #fff; border-radius: 12px; width: 520px; max-width: 92vw; padding: 22px; }
+    .modal h3 { margin: 0 0 16px; }
+    .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+    .modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 18px; }
+    .cond-line { display: grid; grid-template-columns: 1.2fr 1fr 1.4fr auto; gap: 8px; margin-bottom: 8px; }
+    .cond-line input, .cond-line select { padding: 8px; border: 1px solid var(--line); border-radius: 6px; font-size: 13px; }
+    .toast { position: fixed; top: 18px; right: 18px; background: #111827; color: #fff; padding: 10px 16px;
+             border-radius: 8px; font-size: 13px; z-index: 80; }
+    .empty { color: var(--muted); text-align: center; padding: 30px; }
+    .toolbar { display: flex; gap: 10px; margin-bottom: 14px; align-items: center; flex-wrap: wrap; }
+    .toolbar select, .toolbar input { padding: 8px 10px; border: 1px solid var(--line); border-radius: 8px; }
+    pre.payload { background: #0f172a; color: #e2e8f0; padding: 10px; border-radius: 8px; font-size: 12px;
+                  max-height: 220px; overflow: auto; margin: 0; }
+  </style>
+</head>
+<body>
+  <!-- 登录 -->
+  <div id="login" class="login-wrap">
+    <div class="login-card">
+      <h1>企业风控中台</h1>
+      <div class="sub">Risk Control Platform · v1.0.0</div>
+      <div class="field">
+        <label>用户名</label>
+        <input id="username" value="admin" autocomplete="username" />
+      </div>
+      <div class="field">
+        <label>密码</label>
+        <input id="password" type="password" value="123456" autocomplete="current-password" />
+      </div>
+      <button class="btn" onclick="doLogin()">登 录</button>
+      <div id="loginErr" class="err"></div>
+      <div class="demo-accounts">
+        演示账号（密码均为 123456）：<br/>
+        admin 超级管理员 · risk_admin 风控管理员<br/>
+        auditor 审计员 · qc_inspector 质检员 · normal_user 普通用户
+      </div>
+    </div>
+  </div>
+
+  <!-- 主框架 -->
+  <div id="app" class="shell hidden">
+    <div class="sidebar">
+      <div class="logo">🛡 风控中台</div>
+      <a data-nav="dashboard" href="#/dashboard">数据看板</a>
+      <a data-nav="quality" href="#/quality">生产质量</a>
+      <a data-nav="policies" href="#/policies">策略管理</a>
+      <a data-nav="events" href="#/events">风险事件</a>
+      <a data-nav="blacklist" href="#/blacklist">黑白名单</a>
+      <a data-nav="audit" href="#/audit">审计日志</a>
+    </div>
+    <div class="main">
+      <div class="topbar">
+        <div class="who" id="who"></div>
+        <button class="btn ghost sm" onclick="doLogout()">退出登录</button>
+      </div>
+      <div class="content" id="view"></div>
+    </div>
+  </div>
+
+  <div id="modalRoot"></div>
+  <div id="toast" class="toast hidden"></div>
+
+<script>
+const API = "";
+let TOKEN = localStorage.getItem("rc_token") || "";
+let ME = null;
+
+function authHeader() { return TOKEN ? { "Authorization": "Bearer " + TOKEN } : {}; }
+
+async function api(path, opts = {}) {
+  const res = await fetch(API + path, {
+    ...opts,
+    headers: { "Content-Type": "application/json", ...authHeader(), ...(opts.headers || {}) },
+  });
+  if (res.status === 401) { doLogout(); throw new Error("登录已失效"); }
+  if (!res.ok) {
+    let msg = "请求失败(" + res.status + ")";
+    try { const j = await res.json(); if (j.detail) msg = j.detail; } catch (e) {}
+    throw new Error(msg);
+  }
+  if (res.status === 204) return null;
+  return res.json();
+}
+
+function toast(msg) {
+  const t = document.getElementById("toast");
+  t.textContent = msg; t.classList.remove("hidden");
+  setTimeout(() => t.classList.add("hidden"), 2200);
+}
+
+function hasPerm(code) { return ME && (ME.is_superadmin || (ME.permissions || []).includes(code)); }
+
+function fmtTime(s) { if (!s) return "-"; return s.replace("T", " ").slice(0, 19); }
+
+async function doLogin() {
+  const u = document.getElementById("username").value.trim();
+  const p = document.getElementById("password").value;
+  document.getElementById("loginErr").textContent = "";
+  try {
+    const r = await api("/api/auth/login", {
+      method: "POST", body: JSON.stringify({ username: u, password: p }),
+    });
+    TOKEN = r.access_token; localStorage.setItem("rc_token", TOKEN); ME = r.user;
+    enterApp();
+  } catch (e) { document.getElementById("loginErr").textContent = e.message; }
+}
+
+function doLogout() {
+  TOKEN = ""; ME = null; localStorage.removeItem("rc_token");
+  document.getElementById("app").classList.add("hidden");
+  document.getElementById("login").classList.remove("hidden");
+}
+
+function enterApp() {
+  document.getElementById("login").classList.add("hidden");
+  document.getElementById("app").classList.remove("hidden");
+  document.getElementById("who").innerHTML = "当前用户：<b>" + ME.display_name + "</b>（" + ME.username + "）";
+  applyNavPermission();
+  route();
+}
+
+function applyNavPermission() {
+  const map = {
+    dashboard: "dashboard:view", quality: "quality:view", policies: "risk:policy:view", events: "risk:event:view",
+    blacklist: "risk:blacklist:view", audit: "audit:view",
+  };
+  document.querySelectorAll(".sidebar a").forEach(a => {
+    const key = a.getAttribute("data-nav");
+    if (map[key] && !hasPerm(map[key])) a.classList.add("hidden");
+    else a.classList.remove("hidden");
+  });
+}
+
+// ---------------- 路由 ----------------
+const routes = {
+  dashboard: renderDashboard, quality: renderQuality, policies: renderPolicies, events: renderEvents,
+  blacklist: renderBlacklist, audit: renderAudit,
+};
+function route() {
+  let h = location.hash.replace("#/", "") || "dashboard";
+  if (!routes[h]) h = "dashboard";
+  document.querySelectorAll(".sidebar a").forEach(a => {
+    a.classList.toggle("active", a.getAttribute("data-nav") === h);
+  });
+  if (!hasPerm({ dashboard: "dashboard:view", quality: "quality:view", policies: "risk:policy:view", events: "risk:event:view", blacklist: "risk:blacklist:view", audit: "audit:view" }[h])) {
+    document.getElementById("view").innerHTML = '<div class="empty">无访问权限</div>'; return;
+  }
+  routes[h]();
+}
+window.addEventListener("hashchange", route);
+
+// ---------------- 看板 ----------------
+async function renderDashboard() {
+  const v = document.getElementById("view");
+  v.innerHTML = '<h2 class="page-title">数据看板</h2><div class="empty">加载中…</div>';
+  try {
+    const d = await api("/api/dashboard/overview");
+    const blockPct = d.total ? Math.round(d.blocked / d.total * 100) : 0;
+    v.innerHTML = `
+      <h2 class="page-title">数据看板</h2>
+      <div class="cards">
+        <div class="stat"><div class="k">风险事件总数</div><div class="v">${d.total}</div></div>
+        <div class="stat red"><div class="k">阻断(BLOCK)</div><div class="v">${d.blocked}</div></div>
+        <div class="stat amber"><div class="k">预警(WARN)</div><div class="v">${d.warned}</div></div>
+        <div class="stat green"><div class="k">放行(ALLOW)</div><div class="v">${d.allowed}</div></div>
+      </div>
+      <div class="cards">
+        <div class="stat"><div class="k">策略总数</div><div class="v">${d.policies_total}</div></div>
+        <div class="stat green"><div class="k">启用策略</div><div class="v">${d.policies_enabled}</div></div>
+        <div class="stat red"><div class="k">黑名单条目</div><div class="v">${d.black_total}</div></div>
+        <div class="stat"><div class="k">阻断占比</div><div class="v">${blockPct}%</div></div>
+      </div>
+      <div class="panel"><h3>近 7 天事件趋势</h3>${trendHtml(d.trend)}</div>
+      <div class="panel"><h3>高频触发策略 TOP</h3>${topHtml(d.top_rules)}</div>
+      <div class="panel"><h3>高频被阻断主体 TOP</h3>${topHtml(d.top_blocked)}</div>
+    `;
+  } catch (e) { v.innerHTML = '<div class="empty">' + e.message + '</div>'; }
+}
+function trendHtml(trend) {
+  const days = Object.keys(trend).sort();
+  if (!days.length) return '<div class="empty">暂无数据</div>';
+  const max = Math.max(1, ...days.map(d => trend[d].total));
+  return days.map(d => {
+    const b = trend[d]; const w = Math.round(b.total / max * 100);
+    const col = b.block ? "var(--red)" : (b.warn ? "var(--amber)" : "var(--brand)");
+    return `<div class="bar-row"><div class="name">${d}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${w}%;background:${col}"></div></div>
+      <div class="num">${b.total}</div></div>`;
+  }).join("");
+}
+function topHtml(arr) {
+  if (!arr || !arr.length) return '<div class="empty">暂无数据</div>';
+  const max = Math.max(1, ...arr.map(x => x[1]));
+  return arr.map(([name, n]) => {
+    const w = Math.round(n / max * 100);
+    return `<div class="bar-row"><div class="name" title="${name}">${name}</div>
+      <div class="bar-track"><div class="bar-fill" style="width:${w}%"></div></div>
+      <div class="num">${n}</div></div>`;
+  }).join("");
+}
+
+// ---------------- 策略 ----------------
+async function renderPolicies() {
+  const v = document.getElementById("view");
+  v.innerHTML = '<h2 class="page-title">策略管理</h2><div class="empty">加载中…</div>';
+  try {
+    const list = await api("/api/policies");
+    const canManage = hasPerm("risk:policy:manage");
+    let rows = list.map(p => `
+      <tr>
+        <td>${p.name}<br/><span style="color:var(--muted)">${p.description || ""}</span></td>
+        <td>${p.event_type}</td>
+        <td><span class="tag ${p.action === "BLOCK" || p.action === "ADD_BLACKLIST" ? "BLOCK" : (p.action === "WARN" ? "WARN" : "ALLOW")}">${p.action}</span></td>
+        <td>${p.risk_score}</td>
+        <td>${p.priority}</td>
+        <td><span class="tag ${p.enabled ? "on" : "off"}">${p.enabled ? "启用" : "停用"}</span></td>
+        <td>${canManage ? `
+          <button class="btn ghost sm" onclick="editPolicy(${p.id})">编辑</button>
+          <button class="btn amber sm" onclick="togglePolicy(${p.id})">${p.enabled ? "停用" : "启用"}</button>
+          <button class="btn danger sm" onclick="delPolicy(${p.id})">删除</button>` : "-"}</td>
+      </tr>`).join("");
+    v.innerHTML = `
+      <h2 class="page-title">策略管理</h2>
+      <div class="toolbar">${canManage ? '<button class="btn sm" onclick="newPolicy()">+ 新建策略</button>' : ""}
+        <span style="color:var(--muted)">条件为 AND 关系；命中后累计评分并执行动作（ALLOW/WARN/BLOCK/ADD_BLACKLIST）。</span></div>
+      <div class="panel"><table>
+        <thead><tr><th>名称</th><th>事件类型</th><th>动作</th><th>评分</th><th>优先级</th><th>状态</th><th>操作</th></tr></thead>
+        <tbody>${rows || '<tr><td colspan="7" class="empty">暂无策略</td></tr>'}</tbody>
+      </table></div>`;
+  } catch (e) { v.innerHTML = '<div class="empty">' + e.message + '</div>'; }
+}
+
+let policyDraft = null;
+function condRow(c = { field: "", op: "eq", value: "" }) {
+  return `<div class="cond-line">
+    <input placeholder="字段" value="${c.field}" data-f="field" />
+    <select data-f="op">
+      ${["eq","ne","gt","gte","lt","lte","in","not_in","contains","regex","exists"].map(o =>
+        `<option ${o === c.op ? "selected" : ""}>${o}</option>`).join("")}
+    </select>
+    <input placeholder="值(数组用逗号分隔)" value="${c.value === null || c.value === undefined ? "" : c.value}" data-f="value" />
+    <button class="btn danger sm" onclick="this.parentNode.remove()">×</button>
+  </div>`;
+}
+function policyModal(p) {
+  policyDraft = p || { name: "", description: "", event_type: "ALL", enabled: true, priority: 100, action: "WARN", risk_score: 50, conditions: [{ field: "", op: "eq", value: "" }] };
+  const html = `
+    <div class="modal-mask" onclick="if(event.target===this)closeModal()">
+      <div class="modal">
+        <h3>${p ? "编辑策略" : "新建策略"}</h3>
+        <div class="field"><label>名称</label><input id="p_name" value="${policyDraft.name}" /></div>
+        <div class="field"><label>描述</label><input id="p_desc" value="${policyDraft.description || ""}" /></div>
+        <div class="row2">
+          <div class="field"><label>事件类型</label>
+            <select id="p_event">${["ALL","LOGIN","KNOWLEDGE_ACCESS","EXPORT","IMPORT"].map(t =>
+              `<option ${t === policyDraft.event_type ? "selected" : ""}>${t}</option>`).join("")}</select></div>
+          <div class="field"><label>动作</label>
+            <select id="p_action">${["ALLOW","WARN","BLOCK","ADD_BLACKLIST"].map(t =>
+              `<option ${t === policyDraft.action ? "selected" : ""}>${t}</option>`).join("")}</select></div>
+        </div>
+        <div class="row2">
+          <div class="field"><label>风险评分</label><input id="p_score" type="number" value="${policyDraft.risk_score}" /></div>
+          <div class="field"><label>优先级(越小越先)</label><input id="p_prio" type="number" value="${policyDraft.priority}" /></div>
+        </div>
+        <div class="field"><label>条件（AND）</label><div id="condBox">${policyDraft.conditions.map(condRow).join("")}</div>
+          <button class="btn ghost sm" onclick="addCond()">+ 添加条件</button></div>
+        <div class="modal-actions">
+          <button class="btn ghost" onclick="closeModal()">取消</button>
+          <button class="btn" onclick="savePolicy(${p ? p.id : ""})">保存</button>
+        </div>
+      </div>
+    </div>`;
+  document.getElementById("modalRoot").innerHTML = html;
+}
+function addCond() {
+  document.getElementById("condBox").insertAdjacentHTML("beforeend", condRow());
+}
+function newPolicy() { policyModal(null); }
+function editPolicy(id) {
+  api("/api/policies").then(list => {
+    const p = list.find(x => x.id === id);
+    if (p) policyModal(p);
+  }).catch(e => toast(e.message));
+}
+async function savePolicy(id) {
+  const conds = [...document.querySelectorAll("#condBox .cond-line")].map(row => {
+    const f = row.querySelector('[data-f="field"]').value.trim();
+    const op = row.querySelector('[data-f="op"]').value;
+    let val = row.querySelector('[data-f="value"]').value;
+    if (["in", "not_in"].includes(op)) val = val.split(",").map(s => s.trim()).filter(Boolean);
+    else if (["gt","gte","lt","lte"].includes(op)) val = val === "" ? null : Number(val);
+    else if (op === "exists") val = val === "true" || val === "1";
+    return { field: f, op, value: val };
+  }).filter(c => c.field);
+  const body = {
+    name: document.getElementById("p_name").value.trim(),
+    description: document.getElementById("p_desc").value,
+    event_type: document.getElementById("p_event").value,
+    action: document.getElementById("p_action").value,
+    risk_score: Number(document.getElementById("p_score").value),
+    priority: Number(document.getElementById("p_prio").value),
+    enabled: true,
+    conditions: conds,
+  };
+  try {
+    if (id) await api("/api/policies/" + id, { method: "PUT", body: JSON.stringify(body) });
+    else await api("/api/policies", { method: "POST", body: JSON.stringify(body) });
+    closeModal(); toast("已保存"); renderPolicies();
+  } catch (e) { toast(e.message); }
+}
+async function togglePolicy(id) {
+  try { await api("/api/policies/" + id + "/toggle", { method: "POST" }); renderPolicies(); }
+  catch (e) { toast(e.message); }
+}
+async function delPolicy(id) {
+  if (!confirm("确认删除该策略？")) return;
+  try { await api("/api/policies/" + id, { method: "DELETE" }); renderPolicies(); }
+  catch (e) { toast(e.message); }
+}
+
+// ---------------- 事件 ----------------
+async function renderEvents() {
+  const v = document.getElementById("view");
+  v.innerHTML = '<h2 class="page-title">风险事件</h2><div class="empty">加载中…</div>';
+  try {
+    const list = await api("/api/risk/events");
+    let rows = list.map(e => `
+      <tr>
+        <td><span class="tag ${e.decision}">${e.decision}</span></td>
+        <td>${e.event_type}</td>
+        <td>${e.score}</td>
+        <td>${e.actor || "-"}</td>
+        <td>${e.ip || "-"}</td>
+        <td>${(e.triggered_rule_ids || []).join(", ") || "-"}</td>
+        <td>${fmtTime(e.created_at)}</td>
+        <td><button class="btn ghost sm" onclick="showPayload(${e.id})">详情</button></td>
+      </tr>`).join("");
+    v.innerHTML = `
+      <h2 class="page-title">风险事件</h2>
+      <div class="toolbar"><input id="ev_filter" placeholder="事件类型过滤，如 LOGIN" oninput="filterEvents()" style="width:200px"/>
+        <span style="color:var(--muted)">所有决策都会落库，可结合策略与黑白名单追溯。</span></div>
+      <div class="panel"><table>
+        <thead><tr><th>决策</th><th>事件</th><th>评分</th><th>主体</th><th>IP</th><th>触发策略</th><th>时间</th><th>操作</th></tr></thead>
+        <tbody id="evBody">${rows || '<tr><td colspan="8" class="empty">暂无事件</td></tr>'}</tbody>
+      </table></div>`;
+    window.__events = list;
+  } catch (e) { v.innerHTML = '<div class="empty">' + e.message + '</div>'; }
+}
+function filterEvents() {
+  const q = (document.getElementById("ev_filter").value || "").trim().toUpperCase();
+  const list = window.__events || [];
+  const f = q ? list.filter(e => e.event_type.toUpperCase().includes(q)) : list;
+  document.getElementById("evBody").innerHTML = f.map(e => `
+    <tr><td><span class="tag ${e.decision}">${e.decision}</span></td><td>${e.event_type}</td>
+      <td>${e.score}</td><td>${e.actor || "-"}</td><td>${e.ip || "-"}</td>
+      <td>${(e.triggered_rule_ids || []).join(", ") || "-"}</td><td>${fmtTime(e.created_at)}</td>
+      <td><button class="btn ghost sm" onclick="showPayload(${e.id})">详情</button></td></tr>`).join("");
+}
+function showPayload(id) {
+  const e = (window.__events || []).find(x => x.id === id);
+  if (!e) return;
+  document.getElementById("modalRoot").innerHTML = `
+    <div class="modal-mask" onclick="if(event.target===this)closeModal()">
+      <div class="modal"><h3>事件详情 #${e.id}</h3>
+      <p>决策：<span class="tag ${e.decision}">${e.decision}</span> · 评分：${e.score} · 请求ID：${e.request_id || "-"}</p>
+      <p>告警：${(e.alerts || []).join("；") || "-"}</p>
+      <h3>Payload</h3><pre class="payload">${JSON.stringify(e.payload, null, 2)}</pre>
+      <div class="modal-actions"><button class="btn" onclick="closeModal()">关闭</button></div>
+    </div></div>`;
+}
+
+// ---------------- 黑白名单 ----------------
+async function renderBlacklist() {
+  const v = document.getElementById("view");
+  v.innerHTML = '<h2 class="page-title">黑白名单</h2><div class="empty">加载中…</div>';
+  try {
+    const list = await api("/api/blacklist");
+    const canManage = hasPerm("risk:blacklist:manage");
+    let rows = list.map(e => `
+      <tr><td><span class="tag ${e.list_type}">${e.list_type}</span></td>
+        <td>${e.entity_type}</td><td>${e.value}</td><td>${e.reason || "-"}</td>
+        <td>${e.source}</td><td>${fmtTime(e.created_at)}</td>
+        <td>${canManage ? `<button class="btn danger sm" onclick="delEntry(${e.id})">移除</button>` : "-"}</td></tr>`).join("");
+    v.innerHTML = `
+      <h2 class="page-title">黑白名单</h2>
+      <div class="toolbar">${canManage ? '<button class="btn sm" onclick="newEntry()">+ 新增</button>' : ""}
+        <span style="color:var(--muted)">BLACK 命中即阻断；WHITE 命中可豁免阻断。</span></div>
+      <div class="panel"><table>
+        <thead><tr><th>类型</th><th>实体</th><th>值</th><th>原因</th><th>来源</th><th>创建时间</th><th>操作</th></tr></thead>
+        <tbody>${rows || '<tr><td colspan="7" class="empty">暂无记录</td></tr>'}</tbody>
+      </table></div>`;
+  } catch (e) { v.innerHTML = '<div class="empty">' + e.message + '</div>'; }
+}
+function newEntry() {
+  document.getElementById("modalRoot").innerHTML = `
+    <div class="modal-mask" onclick="if(event.target===this)closeModal()"><div class="modal">
+      <h3>新增黑白名单</h3>
+      <div class="row2">
+        <div class="field"><label>类型</label><select id="e_type"><option>BLACK</option><option>WHITE</option></select></div>
+        <div class="field"><label>实体</label><select id="e_entity"><option>IP</option><option>USER</option><option>DEPARTMENT</option></select></div>
+      </div>
+      <div class="field"><label>值</label><input id="e_value" placeholder="如 192.168.1.100 或 用户名" /></div>
+      <div class="field"><label>原因</label><input id="e_reason" /></div>
+      <div class="modal-actions"><button class="btn ghost" onclick="closeModal()">取消</button>
+        <button class="btn" onclick="saveEntry()">保存</button></div>
+    </div></div>`;
+}
+async function saveEntry() {
+  const body = { list_type: document.getElementById("e_type").value, entity_type: document.getElementById("e_entity").value,
+    value: document.getElementById("e_value").value.trim(), reason: document.getElementById("e_reason").value };
+  if (!body.value) { toast("值不能为空"); return; }
+  try { await api("/api/blacklist", { method: "POST", body: JSON.stringify(body) }); closeModal(); renderBlacklist(); }
+  catch (e) { toast(e.message); }
+}
+async function delEntry(id) {
+  if (!confirm("确认移除？")) return;
+  try { await api("/api/blacklist/" + id, { method: "DELETE" }); renderBlacklist(); }
+  catch (e) { toast(e.message); }
+}
+
+// ---------------- 审计 ----------------
+async function renderAudit() {
+  const v = document.getElementById("view");
+  v.innerHTML = '<h2 class="page-title">审计日志</h2><div class="empty">加载中…</div>';
+  try {
+    const list = await api("/api/audit/logs");
+    let rows = list.map(l => `
+      <tr><td>${l.username}</td><td>${l.module}</td><td>${l.action}</td>
+        <td>${l.object_type || "-"}${l.object_id ? " #" + l.object_id : ""}</td>
+        <td>${l.ip || "-"}</td><td>${fmtTime(l.created_at)}</td></tr>`).join("");
+    v.innerHTML = `<h2 class="page-title">审计日志</h2>
+      <div class="panel"><table><thead><tr><th>操作人</th><th>模块</th><th>动作</th><th>对象</th><th>IP</th><th>时间</th></tr></thead>
+      <tbody>${rows || '<tr><td colspan="6" class="empty">暂无日志</td></tr>'}</tbody></table></div>`;
+  } catch (e) { v.innerHTML = '<div class="empty">' + e.message + '</div>'; }
+}
+
+// ---------------- 生产质量 ----------------
+async function renderQuality() {
+  const v = document.getElementById("view");
+  v.innerHTML = '<h2 class="page-title">生产质量风控</h2><div class="empty">加载中…</div>';
+  try {
+    const [stats, batches, insps] = await Promise.all([
+      api("/api/quality/stats"), api("/api/quality/batches"), api("/api/quality/inspections"),
+    ]);
+    const canManage = hasPerm("quality:manage");
+    const batchRows = batches.map(b => `
+      <tr>
+        <td>${b.batch_no}</td><td>${b.product_line}</td><td>${b.product_name || "-"}</td>
+        <td>${b.plan_qty}</td><td>${b.produced_qty}</td>
+        <td><span class="tag ${b.status === "BLOCKED" ? "BLOCK" : (b.status === "INSPECTED" ? "on" : "off")}">${b.status}</span></td>
+        <td>${canManage ? `<button class="btn ghost sm" onclick="openInspect('${b.batch_no}','${b.product_line}')">录入质检</button>` : "-"}</td>
+      </tr>`).join("");
+    const inspRows = insps.map(r => `
+      <tr>
+        <td>${r.batch_no}</td><td>${r.product_line || "-"}</td><td>${r.inspector || "-"}</td>
+        <td>${r.inspected_qty}</td><td>${r.failed_qty}</td><td>${r.defect_rate}%</td>
+        <td><span class="tag ${r.result === "PASS" ? "on" : (r.result === "FAIL" ? "BLOCK" : "WARN")}">${r.result}</span></td>
+        <td><span class="tag ${r.risk_decision}">${r.risk_decision}</span></td>
+        <td>${(r.triggered_rules || []).join("；") || "-"}</td>
+        <td>${fmtTime(r.created_at)}</td>
+      </tr>`).join("");
+    v.innerHTML = `
+      <h2 class="page-title">生产质量风控</h2>
+      <div class="cards">
+        <div class="stat"><div class="k">批次总数</div><div class="v">${stats.total_batches}</div></div>
+        <div class="stat"><div class="k">待检</div><div class="v">${stats.pending}</div></div>
+        <div class="stat green"><div class="k">已检</div><div class="v">${stats.inspected}</div></div>
+        <div class="stat red"><div class="k">阻断批次</div><div class="v">${stats.blocked}</div></div>
+      </div>
+      <div class="cards">
+        <div class="stat red"><div class="k">质检阻断</div><div class="v">${stats.insp_block}</div></div>
+        <div class="stat amber"><div class="k">质检预警</div><div class="v">${stats.insp_warn}</div></div>
+        <div class="stat amber"><div class="k">漏检告警</div><div class="v">${stats.insp_alert}</div></div>
+        <div class="stat green"><div class="k">质检放行</div><div class="v">${stats.insp_pass}</div></div>
+      </div>
+      <div class="panel"><h3>生产批次</h3>
+        <div class="toolbar">${canManage ? '<button class="btn sm" onclick="newBatch()">+ 新建批次</button>' : ""}
+          <span style="color:var(--muted)">批次登记后录入质检即触发风控决策（不合格率/抽检/漏检/产线连续不合格）。</span></div>
+        <table><thead><tr><th>批次号</th><th>产线</th><th>产品</th><th>计划</th><th>实际</th><th>状态</th><th>操作</th></tr></thead>
+          <tbody>${batchRows || '<tr><td colspan="7" class="empty">暂无批次</td></tr>'}</tbody></table></div>
+      <div class="panel"><h3>质检记录</h3>
+        <table><thead><tr><th>批次号</th><th>产线</th><th>质检员</th><th>抽检数</th><th>不合格</th><th>不合格率</th><th>结果</th><th>决策</th><th>命中策略</th><th>时间</th></tr></thead>
+          <tbody>${inspRows || '<tr><td colspan="10" class="empty">暂无质检记录</td></tr>'}</tbody></table></div>`;
+  } catch (e) { v.innerHTML = '<div class="empty">' + e.message + '</div>'; }
+}
+function newBatch() {
+  document.getElementById("modalRoot").innerHTML = `
+    <div class="modal-mask" onclick="if(event.target===this)closeModal()"><div class="modal">
+      <h3>新建生产批次</h3>
+      <div class="field"><label>批次号</label><input id="b_no" placeholder="如 B2026-0001" /></div>
+      <div class="row2">
+        <div class="field"><label>产线</label><input id="b_line" placeholder="如 总装一线" /></div>
+        <div class="field"><label>产品/工序</label><input id="b_name" /></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>计划产量</label><input id="b_plan" type="number" value="0" /></div>
+        <div class="field"><label>实际产出</label><input id="b_prod" type="number" value="0" /></div>
+      </div>
+      <div class="modal-actions"><button class="btn ghost" onclick="closeModal()">取消</button>
+        <button class="btn" onclick="saveBatch()">保存</button></div>
+    </div></div>`;
+}
+async function saveBatch() {
+  const body = {
+    batch_no: document.getElementById("b_no").value.trim(),
+    product_line: document.getElementById("b_line").value.trim(),
+    product_name: document.getElementById("b_name").value.trim(),
+    plan_qty: Number(document.getElementById("b_plan").value || 0),
+    produced_qty: Number(document.getElementById("b_prod").value || 0),
+  };
+  if (!body.batch_no || !body.product_line) { toast("批次号与产线必填"); return; }
+  try { await api("/api/quality/batches", { method: "POST", body: JSON.stringify(body) }); closeModal(); renderQuality(); }
+  catch (e) { toast(e.message); }
+}
+function openInspect(batchNo, line) {
+  document.getElementById("modalRoot").innerHTML = `
+    <div class="modal-mask" onclick="if(event.target===this)closeModal()"><div class="modal">
+      <h3>录入质检 · ${batchNo}</h3>
+      <div class="field"><label>批次号</label><input id="i_no" value="${batchNo}" /></div>
+      <div class="field"><label>产线</label><input id="i_line" value="${line || ""}" /></div>
+      <div class="row2">
+        <div class="field"><label>抽检数量</label><input id="i_insp" type="number" value="0" /></div>
+        <div class="field"><label>不合格数量</label><input id="i_fail" type="number" value="0" /></div>
+      </div>
+      <div class="row2">
+        <div class="field"><label>质检员</label><input id="i_inspector" value="${ME ? ME.display_name : ""}" /></div>
+        <div class="field"><label>抽样方式</label><select id="i_mode"><option>SAMPLE</option><option>FULL</option></select></div>
+      </div>
+      <div class="field"><label><input type="checkbox" id="i_leak" /> 漏检（未检就流转）</label></div>
+      <div class="modal-actions"><button class="btn ghost" onclick="closeModal()">取消</button>
+        <button class="btn" onclick="saveInspect()">提交并决策</button></div>
+    </div></div>`;
+}
+async function saveInspect() {
+  const insp = Number(document.getElementById("i_insp").value || 0);
+  const fail = Number(document.getElementById("i_fail").value || 0);
+  const leak = document.getElementById("i_leak").checked;
+  if (insp <= 0 && !leak) { toast("抽检数量需大于0，或勾选漏检"); return; }
+  if (!leak && fail > insp) { toast("不合格数不能大于抽检数"); return; }
+  const body = {
+    batch_no: document.getElementById("i_no").value.trim(),
+    product_line: document.getElementById("i_line").value.trim(),
+    inspector: document.getElementById("i_inspector").value.trim(),
+    inspected_qty: insp, failed_qty: fail,
+    sample_mode: document.getElementById("i_mode").value, is_leak: leak,
+  };
+  try {
+    const r = await api("/api/quality/inspections", { method: "POST", body: JSON.stringify(body) });
+    closeModal();
+    toast("决策：" + r.decision + (r.triggered_rules.length ? "，命中 " + r.triggered_rules.join("；") : ""));
+    renderQuality();
+  } catch (e) { toast(e.message); }
+}
+
+function closeModal() { document.getElementById("modalRoot").innerHTML = ""; }
+
+// ---------------- 启动 ----------------
+(async function init() {
+  if (!TOKEN) return;
+  try {
+    const me = await api("/api/auth/me");
+    ME = me; enterApp();
+  } catch (e) { /* token 失效，停留登录页 */ }
+})();
+</script>
+</body>
+</html>
